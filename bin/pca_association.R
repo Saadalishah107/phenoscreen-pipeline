@@ -23,12 +23,11 @@ on.exit(snpgdsClose(g), add=TRUE)
 sample_ids <- read.gdsn(index.gdsn(g,"sample.id"))
 snp_id <- read.gdsn(index.gdsn(g,"snp.id"))
 
-# Safely extract snp.rs.id with a fallback if SNPRelate drops the node
 rsid_node <- index.gdsn(g, "snp.rs.id", silent = TRUE)
 if (!is.null(rsid_node)) {
   snp_rsid <- read.gdsn(rsid_node)
 } else {
-  snp_rsid <- paste0("variant_", snp_id)
+  snp_rsid <- as.character(snp_id)
 }
 
 snp_chr <- read.gdsn(index.gdsn(g,"snp.chromosome"))
@@ -37,7 +36,6 @@ snp_pos <- read.gdsn(index.gdsn(g,"snp.position"))
 n_pcs <- min(opt$n_pcs, max(1, length(sample_ids)-1), max(1, length(snp_id)-1))
 pca <- snpgdsPCA(g, num.thread=2, eigen.cnt=n_pcs, verbose=FALSE)
 
-# Cast as data.table to support data.table subsetting syntax below
 pc <- as.data.table(pca$eigenvect[,seq_len(n_pcs),drop=FALSE])
 colnames(pc) <- paste0("PC",seq_len(n_pcs))
 pc$sample_id <- as.character(pca$sample.id)
@@ -71,12 +69,30 @@ for(i in seq_along(snp_id)){
   co <- summary(fit)$coefficients
   if(!"genotype" %in% rownames(co)) next
   res[[i]] <- data.table(
-    snp_id=snp_id[i], rsid=snp_rsid[i], chromosome=snp_chr[i], position=snp_pos[i],
+    snp_id=i, rsid=snp_rsid[i], chromosome=snp_chr[i], position=snp_pos[i],
     beta=co["genotype","Estimate"], se=co["genotype","Std. Error"],
     p_value=co["genotype",ncol(co)]
   )
 }
-a <- rbindlist(res,fill=TRUE)
+
+# --- ROBUSTNESS FIX ---
+a <- rbindlist(Filter(Negate(is.null), res), fill=TRUE)
+
+if (nrow(a) == 0 || !"p_value" %in% names(a)) {
+  message("WARNING: No valid association results were produced.")
+  empty_dt <- data.table(
+    snp_id=integer(), rsid=character(), chromosome=character(), position=numeric(),
+    beta=numeric(), se=numeric(), p_value=numeric(), fdr=numeric(),
+    effect_size=numeric(), selection_status=character()
+  )
+  fwrite(empty_dt, "association_results.tsv", sep="\t")
+  fwrite(empty_dt, "candidate_loci.tsv", sep="\t")
+  file.create("association_manhattan.png")
+  file.create("association_qq.png")
+  cat("Association complete: 0 valid variants tested.\n")
+  quit(status=0)
+}
+
 a <- a[is.finite(p_value)]
 a[,fdr:=p.adjust(p_value,method="BH")]
 a[,effect_size:=beta]
@@ -105,10 +121,6 @@ if(nrow(a)>0){
         geom_point(size=.8)+geom_abline(slope=1,intercept=0)+
         labs(x="Expected -log10(p)",y="Observed -log10(p)",title="Association QQ plot")
   ggsave("association_qq.png",qq,width=5,height=5,dpi=150)
-} else {
-  file.create("association_manhattan.png")
-  file.create("association_qq.png")
 }
-if (!file.exists("pca_scatter_plot.png")) file.create("pca_scatter_plot.png")
 cat(sprintf("Association complete: %d tested; %d FDR-significant; %d downstream candidates.\n",
             nrow(a),nrow(sig),nrow(cand)))

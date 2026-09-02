@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-title: "PhenoScreen v2"
+title: "phenoScreen-pipeline"
 message: "Please cite this repository when using the workflow."
 type: software
 authors:

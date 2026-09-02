@@ -46,7 +46,7 @@ def ensembl_get(url, retries=3):
     return None
 
 def annotate_live(row, species):
-    rsid = row.get("snp_id") or row.get("rsid")
+    rsid = row.get("rsid") or row.get("snp_id")
     if not rsid:
         return None
     base = f"https://rest.ensembl.org"
@@ -105,7 +105,7 @@ def main():
     fixture = read_fixture(a.annotation_tsv)
     records = []
     for row in candidates:
-        rsid = row.get("snp_id") or row.get("rsid")
+        rsid = row.get("rsid") or row.get("snp_id")
         rec = fixture.get(rsid) if fixture else None
         if rec:
             rec = dict(rec)

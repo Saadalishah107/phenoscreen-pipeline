@@ -10,3 +10,9 @@ __pycache__/
 results_live/
 results_real*/
 *.zip
+real_data/
+nci60_data/
+*.vcf.gz
+*.bed
+*.bim
+*.fam
