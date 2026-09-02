@@ -1,9 +1,8 @@
 FROM condaforge/mambaforge:24.7.1-0
 LABEL org.opencontainers.image.title="phenoscreen-cheminformatics"
 RUN mamba install -y -c conda-forge -c pytorch \
-      python=3.9 rdkit=2023.09.6 pandas numpy matplotlib pytorch=2.0.1 cpuonly \
-      scikit-learn scipy requests wget subword-nmt prettytable lifelines tensorboard "libxml2=2.12.*" \
+      python=3.10 rdkit=2023.09.6 pandas numpy matplotlib pytorch=2.0.1 cpuonly \
+      scikit-learn scipy requests wget prettytable lifelines tensorboard "libxml2=2.12.*" \
     && mamba clean -afy
-RUN pip install --no-cache-dir dgllife==0.3.2 DeepPurpose==0.1.5
+RUN pip install --no-cache-dir dgllife==0.3.2 DeepPurpose==0.1.5 subword-nmt
 WORKDIR /workspace
-
