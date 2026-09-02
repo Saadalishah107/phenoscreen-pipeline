@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+title: "PhenoScreen v2"
+message: "Please cite this repository when using the workflow."
+type: software
+authors:
+  - family-names: "Contributors"
+version: "2.0.0"
+license: "MIT"

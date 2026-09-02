@@ -1,0 +1,4 @@
+FROM condaforge/mambaforge:24.7.1-0
+RUN mamba install -y -c conda-forge python=3.10 rdkit pandas numpy matplotlib "libxml2=2.12.*" && mamba clean -afy
+WORKDIR /workspace
+

@@ -1,0 +1,22 @@
+{
+  "name": "phenoscreen-pipeline",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "moby": false,
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "17"
+    }
+  },
+  "postCreateCommand": "curl -fsSL https://get.nextflow.io | bash && sudo mv nextflow /usr/local/bin/nextflow && nextflow -version",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "nf-core.nextflow",
+        "ms-python.python"
+      ]
+    }
+  }
+}

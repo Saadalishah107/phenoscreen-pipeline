@@ -1,0 +1,12 @@
+work/
+results/
+results_test/
+.nextflow/
+.nextflow.log*
+*.pyc
+__pycache__/
+.DS_Store
+.vscode/
+results_live/
+results_real*/
+*.zip

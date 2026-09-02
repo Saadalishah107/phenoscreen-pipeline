@@ -1,0 +1,4 @@
+FROM condaforge/mambaforge:24.7.1-0
+LABEL org.opencontainers.image.title="phenoscreen-genomics"
+RUN mamba install -y -c bioconda -c conda-forge plink=1.90b6.21 plink2 r-base=4.3 r-optparse r-data.table r-ggplot2 bioconductor-snprelate "libxml2=2.12.*" && mamba clean -afy
+WORKDIR /workspace

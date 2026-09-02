@@ -1,0 +1,14 @@
+FROM python:3.11-slim
+
+LABEL org.opencontainers.image.title="phenoscreen-structure"
+LABEL org.opencontainers.image.description="Biopython + ESMFold/AlphaFold API client environment for Phase 2 (structure prediction)"
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        procps \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements-structure.txt /tmp/requirements-structure.txt
+RUN pip install --no-cache-dir -r /tmp/requirements-structure.txt
+
+WORKDIR /workspace
